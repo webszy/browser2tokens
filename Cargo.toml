@@ -1,0 +1,24 @@
+[package]
+name = "browser2tokens"
+version = "0.1.0"
+edition = "2024"
+description = "Browser AI in. Local tokens out."
+default-run = "b2t"
+
+[[bin]]
+name = "b2t"
+path = "src/main.rs"
+
+[dependencies]
+anyhow = "1.0.104"
+axum = "0.8.9"
+chromiumoxide = "0.9.1"
+clap = { version = "4.6.6", features = ["derive"] }
+futures = "0.3.34"
+serde = { version = "1.0.229", features = ["derive"] }
+serde_json = "1.0.151"
+thiserror = "2.0.20"
+tokio = { version = "1.53.1", features = ["full"] }
+tracing = "0.1.44"
+tracing-subscriber = { version = "0.3.23", features = ["env-filter"] }
+uuid = { version = "1.24.1", features = ["v4", "serde"] }
