@@ -14,7 +14,10 @@ use chromiumoxide::page::Page;
 use futures::StreamExt;
 
 const CHATGPT_URL: &str = "https://chatgpt.com";
-const MACOS_CHROME: &str = "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome";
+const MACOS_CHROME_PATHS: [&str; 2] = [
+    "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
+    "/Applications/Google Chrome Canary.app/Contents/MacOS/Google Chrome Canary",
+];
 const TARGET_WAIT: Duration = Duration::from_secs(30);
 const TARGET_POLL: Duration = Duration::from_millis(500);
 
@@ -113,15 +116,19 @@ pub async fn run_cdp_test() -> anyhow::Result<()> {
     Ok(())
 }
 
-fn chrome_executable() -> anyhow::Result<PathBuf> {
-    let path = PathBuf::from(MACOS_CHROME);
-    if path.is_file() {
-        return Ok(path);
+pub(crate) fn chrome_executable() -> anyhow::Result<PathBuf> {
+    for path in MACOS_CHROME_PATHS.map(PathBuf::from) {
+        if path.is_file() {
+            return Ok(path);
+        }
     }
-    bail!("Google Chrome executable not found at {MACOS_CHROME}");
+    bail!(
+        "Google Chrome executable not found; checked {}",
+        MACOS_CHROME_PATHS.join(", ")
+    );
 }
 
-fn profile_dir() -> anyhow::Result<PathBuf> {
+pub(crate) fn profile_dir() -> anyhow::Result<PathBuf> {
     let home = home_dir()?;
     Ok(home.join(".b2t").join("chrome-profile"))
 }
@@ -133,7 +140,7 @@ fn home_dir() -> anyhow::Result<PathBuf> {
         .context("failed to determine user home directory")
 }
 
-async fn wait_for_chatgpt_page(browser: &Browser) -> anyhow::Result<Page> {
+pub(crate) async fn wait_for_chatgpt_page(browser: &Browser) -> anyhow::Result<Page> {
     let deadline = Instant::now() + TARGET_WAIT;
 
     loop {

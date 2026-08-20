@@ -7,6 +7,8 @@ mod runtime;
 mod session;
 #[path = "testCDP.rs"]
 mod test_cdp;
+#[path = "testChatgpt.rs"]
+mod test_chatgpt;
 mod transport;
 
 use anyhow::Context;
@@ -27,6 +29,8 @@ enum Command {
     Start,
     /// Isolated CDP spike: launch managed Chrome and evaluate JS on ChatGPT
     TestCdp,
+    /// Isolated ChatGPT network observation spike
+    TestChatgpt,
 }
 
 #[tokio::main]
@@ -42,6 +46,9 @@ async fn main() -> anyhow::Result<()> {
                 .context("failed to start Browser2Tokens runtime")?;
         }
         Command::TestCdp => test_cdp::run_cdp_test().await.context("CDP spike failed")?,
+        Command::TestChatgpt => test_chatgpt::run_chatgpt_test()
+            .await
+            .context("ChatGPT network observation spike failed")?,
     }
 
     Ok(())
